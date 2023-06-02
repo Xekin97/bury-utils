@@ -6,6 +6,10 @@ export function isTargetElement(
 
 export function isTargetInputElement(
 	target: Event["target"]
-): target is HTMLInputElement {
-	return (target as HTMLElement)?.nodeName === "INPUT";
+): target is HTMLElement {
+	return (
+		(target as HTMLElement)?.nodeName === "INPUT" ||
+		(target as HTMLElement)?.nodeName === "TEXTAREA" ||
+		(target as HTMLElement)?.contentEditable !== void 0
+	);
 }

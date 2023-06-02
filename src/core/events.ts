@@ -32,14 +32,14 @@ export function listenClick(callback: (data: EventData<HTMLElement>) => void) {
 	};
 }
 
-export function listenInput(callback: (event: EventData<string>) => void) {
+export function listenInput(callback: (data: EventData<string>) => void) {
 	const onFocus = (event: Event) => {
 		const target = event.target;
 		if (isTargetInputElement(target)) {
-			const beforeValue = target.value;
+			const beforeValue = target.textContent ?? "";
 
 			const onInputEnd = () => {
-				const afterValue = target.value;
+				const afterValue = target.textContent ?? "";
 				if (beforeValue !== afterValue) {
 					callback({
 						name: "input",
@@ -74,24 +74,51 @@ export function listenInput(callback: (event: EventData<string>) => void) {
 }
 
 export function listenScriptError(
-	callback: (error: ErrorEvent | PromiseRejectionEvent) => void
+	callback: (error: EventData<string>) => void
 ) {
-	const onError = () => {};
+	const onError = (event: ErrorEvent | PromiseRejectionEvent) => {
+		callback({
+			name: "error",
+			value:
+				(event as ErrorEvent).message ??
+				(event as PromiseRejectionEvent).reason,
+			event,
+		});
+	};
 
-	window.addEventListener("error", callback, true);
-	window.addEventListener("unhandledrejection", callback, true);
+	window.addEventListener("error", onError, true);
+	window.addEventListener("unhandledrejection", onError, true);
 	return () => {
-		window.removeEventListener("error", callback, true);
-		window.removeEventListener("unhandledrejection", callback, true);
+		window.removeEventListener("error", onError, true);
+		window.removeEventListener("unhandledrejection", onError, true);
 	};
 }
 
 export function listenUrl() {}
 
-export function listenNetword() {}
+export function listenNetwork() {}
 
 export function listenExpose() {}
 
-export function listenMouse() {}
+export function listenMouse(
+	callback: (data: EventData<{ x: number; y: number }>) => void
+) {
+	const onMove = (event: MouseEvent) => {
+		callback({
+			name: "mouse",
+			value: {
+				x: event.clientX,
+				y: event.clientY,
+			},
+			event,
+		});
+	};
+
+	document.addEventListener("mousemove", onMove, true);
+
+	return () => {
+		document.removeEventListener("mousemove", onMove, true);
+	};
+}
 
 export function listenPerformance() {}
