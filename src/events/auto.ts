@@ -4,20 +4,10 @@ import {
 	isTargetInputElement,
 	overrideFunction,
 } from "../utils";
-
-export interface EventData<V = any> {
-	name: string;
-	value: V;
-	event:
-		| Event
-		| {
-				name: string;
-				params: any[];
-		  };
-}
+import { EventCallback } from "./types";
 
 // element click
-export function listenClick(callback: (data: EventData<HTMLElement>) => void) {
+export function listenClick(callback: EventCallback<HTMLElement>) {
 	const onClick = (event: MouseEvent) => {
 		const target = event.target;
 		if (isTargetElement(target)) {
@@ -44,7 +34,7 @@ export function listenClick(callback: (data: EventData<HTMLElement>) => void) {
 }
 
 // input value
-export function listenInput(callback: (data: EventData<string>) => void) {
+export function listenInput(callback: EventCallback<string>) {
 	const onFocus = (event: Event) => {
 		const target = event.target;
 		if (isTargetInputElement(target)) {
@@ -86,9 +76,7 @@ export function listenInput(callback: (data: EventData<string>) => void) {
 }
 
 // script error
-export function listenScriptError(
-	callback: (error: EventData<string>) => void
-) {
+export function listenScriptError(callback: EventCallback<string>) {
 	const onError = (event: ErrorEvent | PromiseRejectionEvent) => {
 		callback({
 			name: "error",
@@ -109,7 +97,7 @@ export function listenScriptError(
 
 // url change
 export function listenUrlChange(
-	callback: (data: EventData<{ from: string; to: string }>) => void
+	callback: EventCallback<{ from: string; to: string }>
 ) {
 	let alive = true;
 
@@ -175,16 +163,8 @@ export function listenUrlChange(
 	};
 }
 
-// network change
-export function listenNetwork() {}
-
-// element exposure
-export function listenExpose() {}
-
 // mouse move
-export function listenMouse(
-	callback: (data: EventData<{ x: number; y: number }>) => void
-) {
+export function listenMouse(callback: EventCallback<{ x: number; y: number }>) {
 	const onMove = (event: MouseEvent) => {
 		callback({
 			name: "mouse",
@@ -203,8 +183,8 @@ export function listenMouse(
 	};
 }
 
-// assets load
-export function listenAssets() {}
+// network change
+export function listenNetwork() {}
 
-// performance
-export function listenPerformance() {}
+// web life
+export function listenWebLife() {}
