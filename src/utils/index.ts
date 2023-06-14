@@ -1,3 +1,5 @@
+import { NetworkData } from "../events/types";
+
 export function isTargetElement(
 	target: Event["target"]
 ): target is HTMLElement {
@@ -48,4 +50,21 @@ export function overrideFunction<
 	obj[key] = result.bind(obj);
 
 	return obj;
+}
+
+export function getNetworkData(): void | Omit<
+	NetworkData,
+	"isOnline" | "offlineAt" | "onlineAt"
+> {
+	if (navigator && "connection" in navigator) {
+		const connection = navigator.connection as any;
+		return {
+			downlink: connection.downlink,
+			downlinkMax: connection.downlinkMax,
+			effectiveType: connection.effectiveType,
+			rtt: connection.rtt,
+			saveData: connection.saveData,
+			type: connection.type,
+		};
+	}
 }

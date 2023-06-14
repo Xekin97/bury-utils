@@ -1,10 +1,11 @@
 import {
+	getNetworkData,
 	getUrlAfterStateChange,
 	isTargetElement,
 	isTargetInputElement,
 	overrideFunction,
 } from "../utils";
-import { EventCallback } from "./types";
+import { EventCallback, NetworkData } from "./types";
 
 // element click
 export function listenClick(callback: EventCallback<HTMLElement>) {
@@ -49,12 +50,6 @@ export function listenInput(callback: EventCallback<string>) {
 						event,
 					});
 				}
-				window.removeEventListener("beforeunload", onInputEnd, {
-					capture: true,
-				});
-				document.removeEventListener("blur", onInputEnd, {
-					capture: true,
-				});
 			};
 
 			document.addEventListener("blur", onInputEnd, {
@@ -184,7 +179,32 @@ export function listenMouse(callback: EventCallback<{ x: number; y: number }>) {
 }
 
 // network change
-export function listenNetwork() {}
+export function listenNetwork(callback: EventCallback<NetworkData>) {
+	const isSupported = navigator && "connection" in navigator;
 
-// web life
-export function listenWebLife() {}
+	if (!isSupported) return () => {};
+
+	const onNetworkChange = (event: Event) => {
+		const value: NetworkData = {
+			isOnline: navigator.onLine,
+			offlineAt: navigator.onLine ? void 0 : Date.now(),
+			onlineAt: navigator.onLine ? Date.now() : void 0,
+			...getNetworkData()!,
+		};
+
+		callback({
+			name: "network",
+			value,
+			event,
+		});
+	};
+
+	window.addEventListener("offline", onNetworkChange);
+	window.addEventListener("online", onNetworkChange);
+	return () => {
+		window.removeEventListener("offline", onNetworkChange);
+		window.removeEventListener("online", onNetworkChange);
+	};
+}
+
+export function listenExpose() {}
