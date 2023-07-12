@@ -206,5 +206,3 @@ export function listenNetwork(callback: EventCallback<NetworkData>) {
 		window.removeEventListener("online", onNetworkChange);
 	};
 }
-
-export function listenExpose() {}

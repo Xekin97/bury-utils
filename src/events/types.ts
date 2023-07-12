@@ -1,15 +1,3 @@
-export type EventType =
-	| "click"
-	| "error"
-	| "expose"
-	| "input"
-	| "mouse"
-	| "network"
-	| "url"
-	| "life";
-
-export type EventCallback<V = any> = (data: EventData<V>) => void;
-
 export interface EventData<V = any> {
 	name: string;
 	value: V;
@@ -20,6 +8,20 @@ export interface EventData<V = any> {
 				params: any[];
 		  };
 }
+
+export type EventCallback<V = any> = (data: EventData<V>) => void;
+export interface EventMap {
+	click: EventCallback<HTMLElement>;
+	input: EventCallback<string>;
+	scriptErrpr: EventCallback<string>;
+	url: EventCallback<{ from: string; to: string }>;
+	mouse: EventCallback<{ x: number; y: number }>;
+	network: EventCallback<NetworkData>;
+}
+
+export type EventType = keyof EventMap;
+
+export type SpotEvent<T> = (callback: EventCallback<T>) => () => void;
 
 export type NetworkType =
 	| "bluetooth"
